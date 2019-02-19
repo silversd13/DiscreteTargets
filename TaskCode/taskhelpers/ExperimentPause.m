@@ -1,8 +1,6 @@
 function [Neuro,Data] = ExperimentPause(Params,Neuro,Data)
 % Display text then wait for subject to resume experiment
 
-global Cursor
-
 % Pause Screen
 tex = 'Paused... Press ''p'' to continue, ''escape'' to quit, or ''d'' to debug';
 DrawFormattedText(Params.WPTR, tex,'center','center',255);
@@ -30,9 +28,8 @@ while 1, % pause until subject presses p again or quits
     
     % grab and process neural data
     tim = GetSecs;
-    if ((tim-Cursor.LastUpdateTime)>1/Params.UpdateRate),
-        Cursor.LastUpdateTime = tim;
-        Cursor.LastPredictTime = tim;
+    if ((tim-Neuro.LastUpdateTime)>1/Params.UpdateRate),
+        Neuro.LastUpdateTime = tim;
         if Params.BLACKROCK,
             [Neuro,Data] = NeuroPipeline(Neuro,Data);
             Data.NeuralTime(1,end+1) = tim;

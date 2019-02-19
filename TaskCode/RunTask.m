@@ -21,7 +21,7 @@ switch TaskFlag,
         fprintf('  Saving data to %s\n\n',fullfile(Params.Datadir,'Imagined'))
         
         Neuro.DimRed.Flag = false; % set to false for imagined mvmts
-        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'Imagined'));
+        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'Imagined'),[]);
         
     case 2, % Fixed Decoder
         Instructions = [...
@@ -33,9 +33,18 @@ switch TaskFlag,
         InstructionScreen(Params,Instructions);
         mkdir(fullfile(Params.Datadir,'BCI_Fixed'));
         
-            
+        % Fit Dimensionality Reduction Params & Decoder
+        % based on imagined mvmts
         Neuro.DimRed.Flag = Params.DimRed.Flag; % reset for task
-        % fit decoder
+        if Params.DimRed.Flag,
+            Neuro.DimRed.F = FitDimRed(...
+                fullfile(Params.Datadir,'Imagined'),Neuro.DimRed);
+            TargetClassifier = FitClassifier(Params,...
+                fullfile(Params.Datadir,'Imagined'),Neuro.DimRed.F);
+        else, % no dim reduction
+            TargetClassifier = FitClassifier(Params,...
+                fullfile(Params.Datadir,'Imagined'));
+        end
         
         % output to screen
         fprintf('\n\nFixed Selections:\n')
@@ -44,7 +53,7 @@ switch TaskFlag,
             Params.NumFixedBlocks*Params.NumTrialsPerBlock)
         fprintf('  Saving data to %s\n\n',fullfile(Params.Datadir,'BCI_Fixed'))
         
-        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'BCI_Fixed'));
+        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'BCI_Fixed'),TargetClassifier);
         
 end
 

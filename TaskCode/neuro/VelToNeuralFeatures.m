@@ -24,8 +24,8 @@ if ~exist('PLOT','var'), PLOT = 0; end
 
 % compute velocities
 [x,y] = GetMouse();
-Vx = Params.Gain * (x - Params.Center(1));
-Vy = Params.Gain * (y - Params.Center(2));
+Vx = (x - Params.Center(1));
+Vy = (y - Params.Center(2));
 
 % rescaling to matrix map
 MdataSizeY=32;

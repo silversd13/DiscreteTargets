@@ -1,7 +1,6 @@
-function ExperimentStart(Subject,ControlMode,BLACKROCK,DEBUG)
-% function ExperimentStart(Subject,ControlMode)
+function ExperimentStart(Subject,BLACKROCK,DEBUG)
+% function ExperimentStart(Subject)
 % Subject - string for the subject id
-% ControlMode - [1,2,3] for mouse pos, mouse vel, & kalman
 % BLACKROCK - [0,1] if 1, collects, processes, and saves neural data
 % DEBUG - [0,1] if 1, enters DEBUG mode in which screen is small and cursor
 %   remains unhidden
@@ -135,7 +134,7 @@ try
     
     % Fixed Decoder Loop
     if Params.NumFixedBlocks>0,
-        Neuro = RunTask(Params,Neuro,3);
+        Neuro = RunTask(Params,Neuro,2);
     end
     
     % Pause and Finish!

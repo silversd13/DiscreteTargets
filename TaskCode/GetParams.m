@@ -9,6 +9,7 @@ Params.Verbose = true;
 
 %% Experiment
 Params.Task = 'DiscreteTargets';
+Params.ClassifierType = 1; % 1-LDA, 2-QDA
 
 %% Current Date and Time
 % get today's date
@@ -25,11 +26,11 @@ if strcmpi(Params.Subject,'Test'),
 end
 
 if IsWin,
-    projectdir = 'C:\Users\ganguly-lab2\Documents\MATLAB\CursorControlRandomTargets';
+    projectdir = 'C:\Users\ganguly-lab2\Documents\MATLAB\DiscreteTargets';
 elseif IsOSX,
-    projectdir = '/Users/daniel/Projects/CursorControlRandomTargets/';
+    projectdir = '/Users/daniel/Projects/DiscreteTargets/';
 else,
-    projectdir = '/home/dsilver/Projects/CursorControlRandomTargets/';
+    projectdir = '/home/dsilver/Projects/DiscreteTargets/';
 end
 addpath(genpath(fullfile(projectdir,'TaskCode')));
 
@@ -60,33 +61,42 @@ mkdir(datadir);
 %% Timing
 Params.ScreenRefreshRate = 10; % Hz
 Params.UpdateRate = 10; % Hz
-Params.BaselineTime = 10; % secs
+Params.BaselineTime = 0; % secs
 
 %% Targets
 Params.TargetSize = 30;
 Params.TargetRect = ...
     [-Params.TargetSize -Params.TargetSize +Params.TargetSize +Params.TargetSize];
-Params.OutTargetColor = [0,255,0];
-Params.InTargetColor = [255,0,0];
-Params.TargetSelectionFlag  = 2; % 1-uniform from workspace, 2-1, but must be dist away from cursor
+Params.OffCol  = [100,100,100];
+Params.OnCol    = [0,255,0];
+Params.SelCol  = [255,0,0];
+
+Params.TargetAngles = (0:90:(360-90))';
+Params.TargetRadius = 300;
+Params.TargetPositions = ...
+    + Params.TargetRadius ...
+    * [cosd(Params.TargetAngles) sind(Params.TargetAngles)];
+Params.NumTargets = length(Params.TargetAngles);
+
+Params.TargetSelectionFlag  = 1; % 1-pseudorandom, 2-random
 switch Params.TargetSelectionFlag,
-    case 1, Params.TargetFunc = @() URand(Params.Workspace);
-    case 2, Params.TargetFunc = @() URandDist(Params.Workspace,Params.NewTargetDist);
+    case 1, Params.TargetFunc = @(n) mod(randperm(n),Params.NumTargets)+1;
+    case 2, Params.TargetFunc = @(n) mod(randi(n,1,n),Params.NumTargets)+1;
 end
 
 %% Trial and Block Types
-Params.NumImaginedBlocks    = 1;
-Params.NumFixedBlocks       = 1;
-Params.NumTrialsPerBlock    = length(Params.TargetAngles);
+Params.NumImaginedBlocks    = 0;
+Params.NumFixedBlocks       = 2;
+Params.NumTrialsPerBlock    = Params.NumTargets;
 
 %% Hold Times
-Params.InterTrialInterval   = 0;
-Params.SelectionInterval    = 10;
+Params.InterTrialInterval   = 1;
+Params.SelectionInterval    = 3;
 Params.InterBlockInterval   = 0;
+Params.FeedbackInterval     = 1;
 
 %% Feedback
 Params.FeedbackSound = false;
-Params.ErrorWaitTime = 2;
 Params.ErrorSound = 1000*audioread('buzz.wav');
 Params.ErrorSoundFs = 8192;
 [Params.RewardSound,Params.RewardSoundFs] = audioread('reward1.wav');
@@ -99,7 +109,7 @@ Params.ZscoreRawFlag = true;
 Params.ZscoreFeaturesFlag = false;
 Params.SaveProcessed = false;
 
-Params.DimRed.Flag = false;
+Params.DimRed.Flag = true;
 Params.DimRed.Method = 1; % 1-pca, 2-fa
 Params.DimRed.AvgTrialsFlag = false; % 0-cat imagined mvmts, 1-avg imagined mvmts
 Params.DimRed.NumDims = [];
