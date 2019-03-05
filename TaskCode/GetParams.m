@@ -85,7 +85,7 @@ switch Params.TargetSelectionFlag,
 end
 
 %% Trial and Block Types
-Params.NumImaginedBlocks    = 0;
+Params.NumImaginedBlocks    = 2;
 Params.NumFixedBlocks       = 2;
 Params.NumTrialsPerBlock    = Params.NumTargets;
 
