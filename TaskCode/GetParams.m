@@ -30,7 +30,7 @@ if IsWin,
 elseif IsOSX,
     projectdir = '/Users/daniel/Projects/DiscreteTargets/';
 else,
-    projectdir = '/home/dsilver/Projects/DiscreteTargets/';
+    projectdir = '~/Projects/DiscreteTargets/';
 end
 addpath(genpath(fullfile(projectdir,'TaskCode')));
 
