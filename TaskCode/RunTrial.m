@@ -73,15 +73,15 @@ if Params.InterTrialInterval>0,
                 Neuro.LastUpdateTime = tim;
                 if Params.BLACKROCK,
                     [Neuro,Data] = NeuroPipeline(Neuro,Data);
-                    Data.NeuralTime{NumEvents,end+1} = tim;
-                elseif Params.GenNeuralFeaturesFlag,
+                    Data.NeuralTime(1,end+1) = tim;
+                end
+                if Params.GenNeuralFeaturesFlag,
                     Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
-                    if Neuro.DimRed.Flag,
-                        Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
-                        Data.NeuralFactors{NumEvents,end+1} = Neuro.NeuralFactors;
-                    end
-                    Data.NeuralFeatures{NumEvents,end+1} = Neuro.NeuralFeatures;
-                    Data.NeuralTime{NumEvents,end+1} = tim;
+                    Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+                end
+                if Neuro.DimRed.Flag,
+                    Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
+                    Data.NeuralFactors{end+1} = Neuro.NeuralFactors;
                 end
             end
             
@@ -130,15 +130,15 @@ while ~done,
             Neuro.LastUpdateTime = tim;
             if Params.BLACKROCK,
                 [Neuro,Data] = NeuroPipeline(Neuro,Data);
-                Data.NeuralTime{NumEvents,end+1} = tim;
-            elseif Params.GenNeuralFeaturesFlag,
+                Data.NeuralTime(1,end+1) = tim;
+            end
+            if Params.GenNeuralFeaturesFlag,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
-                if Neuro.DimRed.Flag,
-                    Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
-                    Data.NeuralFactors{NumEvents,end+1} = Neuro.NeuralFactors;
-                end
-                Data.NeuralFeatures{NumEvents,end+1} = Neuro.NeuralFeatures;
-                Data.NeuralTime{NumEvents,end+1} = tim;
+                Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+            end
+            if Neuro.DimRed.Flag,
+                Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
+                Data.NeuralFactors{end+1} = Neuro.NeuralFactors;
             end
         end
         
@@ -224,15 +224,15 @@ while ~done,
             Neuro.LastUpdateTime = tim;
             if Params.BLACKROCK,
                 [Neuro,Data] = NeuroPipeline(Neuro,Data);
-                Data.NeuralTime{NumEvents,end+1} = tim;
-            elseif Params.GenNeuralFeaturesFlag,
+                Data.NeuralTime(1,end+1) = tim;
+            end
+            if Params.GenNeuralFeaturesFlag,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
-                if Neuro.DimRed.Flag,
-                    Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
-                    Data.NeuralFactors{NumEvents,end+1} = Neuro.NeuralFactors;
-                end
-                Data.NeuralFeatures{NumEvents,end+1} = Neuro.NeuralFeatures;
-                Data.NeuralTime{NumEvents,end+1} = tim;
+                Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+            end
+            if Neuro.DimRed.Flag,
+                Neuro.NeuralFactors = Neuro.DimRed.F(Neuro.NeuralFeatures);
+                Data.NeuralFactors{end+1} = Neuro.NeuralFactors;
             end
         end
         
