@@ -108,6 +108,7 @@ Params.GenNeuralFeaturesFlag = true;
 Params.ZscoreRawFlag = true;
 Params.ZscoreFeaturesFlag = false;
 Params.SaveProcessed = false;
+Params.SaveRaw = true;
 
 Params.DimRed.Flag = true;
 Params.DimRed.Method = 1; % 1-pca, 2-fa
