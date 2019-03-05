@@ -129,12 +129,12 @@ try
     
     % Imagined Selection Loop
     if Params.NumImaginedBlocks>0,
-        Neuro = RunTask(Params,Neuro,1);
+        [Neuro,Params] = RunTask(Params,Neuro,1);
     end
     
     % Fixed Decoder Loop
     if Params.NumFixedBlocks>0,
-        Neuro = RunTask(Params,Neuro,2);
+        [Neuro,Params] = RunTask(Params,Neuro,2);
     end
     
     % Pause and Finish!

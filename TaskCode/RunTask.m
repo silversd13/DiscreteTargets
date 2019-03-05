@@ -1,4 +1,4 @@
-function Neuro = RunTask(Params,Neuro,TaskFlag)
+function [Neuro,Params] = RunTask(Params,Neuro,TaskFlag)
 % Explains the task to the subject, and serves as a reminder for pausing
 % and quitting the experiment (w/o killing matlab or something)
 
@@ -21,7 +21,7 @@ switch TaskFlag,
         fprintf('  Saving data to %s\n\n',fullfile(Params.Datadir,'Imagined'))
         
         Neuro.DimRed.Flag = false; % set to false for imagined mvmts
-        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'Imagined'),[]);
+        [Neuro,Params] = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'Imagined'),[]);
         
     case 2, % Fixed Decoder
         Instructions = [...
@@ -53,7 +53,7 @@ switch TaskFlag,
             Params.NumFixedBlocks*Params.NumTrialsPerBlock)
         fprintf('  Saving data to %s\n\n',fullfile(Params.Datadir,'BCI_Fixed'))
         
-        Neuro = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'BCI_Fixed'),TargetClassifier);
+        [Neuro,Params] = RunLoop(Params,Neuro,TaskFlag,fullfile(Params.Datadir,'BCI_Fixed'),TargetClassifier);
         
 end
 

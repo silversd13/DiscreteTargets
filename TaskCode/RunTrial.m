@@ -1,4 +1,4 @@
-function [Data, Neuro] = RunTrial(Data,Params,Neuro,TaskFlag,TargetClassifier)
+function [Data, Neuro, Params] = RunTrial(Data,Params,Neuro,TaskFlag,TargetClassifier)
 % Runs a trial, saves useful data along the way
 % Each trial contains the following pieces
 % 1) Inter-trial interval
@@ -55,7 +55,7 @@ if Params.InterTrialInterval>0,
         tim = GetSecs;
 
         % for pausing and quitting expt
-        if CheckPause, [Neuro,Data] = ExperimentPause(Params,Neuro,Data); end
+        if CheckPause, [Neuro,Data,Params] = ExperimentPause(Params,Neuro,Data); end
 
         % Update Screen Every Xsec
         if (tim-LastPredictTime) > 1/Params.ScreenRefreshRate,
@@ -112,7 +112,7 @@ while ~done,
     tim = GetSecs;
     
     % for pausing and quitting expt
-    if CheckPause, [Neuro,Data] = ExperimentPause(Params,Neuro,Data); end
+    if CheckPause, [Neuro,Data,Params] = ExperimentPause(Params,Neuro,Data); end
     
     % Update Screen
     if (tim-LastPredictTime) > 1/Params.ScreenRefreshRate,
@@ -206,7 +206,7 @@ while ~done,
     tim = GetSecs;
     
     % for pausing and quitting expt
-    if CheckPause, [Neuro,Data] = ExperimentPause(Params,Neuro,Data); end
+    if CheckPause, [Neuro,Data,Params] = ExperimentPause(Params,Neuro,Data); end
     
     % Update Screen
     if (tim-LastPredictTime) > 1/Params.ScreenRefreshRate,
