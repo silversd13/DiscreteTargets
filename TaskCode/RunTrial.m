@@ -79,8 +79,10 @@ if Params.InterTrialInterval>0,
                     Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                     if Params.BLACKROCK, % override
                         Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
+                        Data.NeuralTime(1,end) = tim;
                     else,
                         Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+                        Data.NeuralTime(1,end+1) = tim;
                     end
                 end
                 if Neuro.DimRed.Flag,
@@ -140,8 +142,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
+                    Data.NeuralTime(1,end) = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+                    Data.NeuralTime(1,end+1) = tim;
                 end
             end
             if Neuro.DimRed.Flag,
@@ -238,8 +242,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
+                    Data.NeuralTime(1,end) = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
+                    Data.NeuralTime(1,end+1) = tim;
                 end
             end
             if Neuro.DimRed.Flag,
