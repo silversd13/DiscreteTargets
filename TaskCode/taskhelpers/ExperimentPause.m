@@ -9,6 +9,7 @@ Screen('Flip', Params.WPTR);
 % add event to data structure
 Data.Events(end+1).Time = GetSecs;
 Data.Events(end).Str  = 'Pause';
+if Params.ArduinoSync, PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,length(Data.Events)); end
 
 KbCheck;
 WaitSecs(.1);
@@ -44,6 +45,7 @@ end
 % add event to data structure
 Data.Events(end+1).Time = GetSecs;
 Data.Events(end).Str  = 'EndPause';
+if Params.ArduinoSync, PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,length(Data.Events)); end
 
 Screen('Flip', Params.WPTR);
 WaitSecs(.1);
