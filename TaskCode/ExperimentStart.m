@@ -6,7 +6,8 @@ function ExperimentStart(Subject,BLACKROCK,DEBUG)
 %   remains unhidden
 
 %% Clear All and Close All
-clearvars -global -except Subject BLACKROCK DEBUG
+clearvars -except Subject BLACKROCK DEBUG
+clearvars -global
 clc
 warning off
 
@@ -35,6 +36,19 @@ if BLACKROCK,
     cbmex('close'); % always close
     cbmex('open'); % open library
     cbmex('trialconfig', 1); % empty the buffer
+end
+
+%% Initialize Sync to Blackrock
+if Params.SerialSync,
+    Params.SerialPtr = serial(Params.SyncDev, 'BaudRate', Params.BaudRate);
+    fopen(Params.SerialPtr);
+    fprintf(Params.SerialPtr, '%s\n', 'START');
+end
+if Params.ArduinoSync,
+    Params.ArduinoPtr = arduino;
+    Params.ArduinoPin = 'D13';
+    writeDigitalPin(Params.ArduinoPtr, Params.ArduinoPin, 0); % make sure the pin is at 0
+    PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,20);
 end
 
 %% Neural Signal Processing

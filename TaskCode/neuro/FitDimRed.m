@@ -27,6 +27,9 @@ switch DimRed.AvgTrialsFlag,
         fprintf('  Averaging Trials\n\n')
 end
 
+% always use gui to override datadir
+DataDir = uigetdir(DataDir);
+
 % load all data & organize according to DimRed.
 datafiles = dir(fullfile(DataDir,'Data*.mat'));
 X = [];

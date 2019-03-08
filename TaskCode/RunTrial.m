@@ -44,6 +44,7 @@ if Params.InterTrialInterval>0,
     Data.Events(end+1).Time = tstart;
     Data.Events(end).Str  = 'Inter Trial Interval';
     NumEvents = length(Data.Events);
+    if Params.ArduinoSync, PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,length(Data.Events)); end
     
     % draw
     Screen('Flip', Params.WPTR);
@@ -79,10 +80,10 @@ if Params.InterTrialInterval>0,
                     Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                     if Params.BLACKROCK, % override
                         Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                        Data.NeuralTime(1,end) = tim;
+                        Data.NeuralTime{1,end} = tim;
                     else,
                         Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                        Data.NeuralTime(1,end+1) = tim;
+                        Data.NeuralTime{1,end+1} = tim;
                     end
                 end
                 if Neuro.DimRed.Flag,
@@ -106,6 +107,7 @@ tstart  = GetSecs;
 Data.Events(end+1).Time = tstart;
 Data.Events(end).Str  = 'Target Selection Interval';
 NumEvents = length(Data.Events);
+if Params.ArduinoSync, PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,length(Data.Events)); end
 
 % draw
 Screen('FillOval', Params.WPTR, TargetCol, TargetRect);
@@ -142,10 +144,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                    Data.NeuralTime(1,end) = tim;
+                    Data.NeuralTime{1,end} = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                    Data.NeuralTime(1,end+1) = tim;
+                    Data.NeuralTime{1,end+1} = tim;
                 end
             end
             if Neuro.DimRed.Flag,
@@ -171,11 +173,17 @@ switch TaskFlag,
         if ~exist('TargetClassifier','var'),
             error('No classifier given'); 
         else,
+            % ignore inter-trial interval data
+            if strcmp(Data.Events(1).Str, 'Inter Trial Interval'),
+                tidx = Data.Time >= Data.Events(2).Time;
+            else,
+                tidx = Data.Time >= Data.Events(1).Time;
+            end
             if Neuro.DimRed.Flag,
-                X = cat(2,Data.NeuralFactors{NumEvents,:});
+                X = cat(2,Data.NeuralFactors{:,tidx});
                 X = X(:)';
             else,
-                X = cat(2,Data.NeuralFeatures{NumEvents,:});
+                X = cat(2,Data.NeuralFeatures{:,tidx});
                 X = X(:)';
             end
             Data.SelectedTargetID = predict(TargetClassifier,X);
@@ -188,6 +196,7 @@ tstart  = GetSecs;
 Data.Events(end+1).Time = tstart;
 Data.Events(end).Str  = 'Feedback Interval';
 NumEvents = length(Data.Events);
+if Params.ArduinoSync, PulseArduino(Params.ArduinoPtr,Params.ArduinoPin,length(Data.Events)); end
 
 % correct or not?
 if Data.SelectedTargetID==Data.TargetID,
@@ -242,10 +251,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                    Data.NeuralTime(1,end) = tim;
+                    Data.NeuralTime{1,end} = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                    Data.NeuralTime(1,end+1) = tim;
+                    Data.NeuralTime{1,end+1} = tim;
                 end
             end
             if Neuro.DimRed.Flag,

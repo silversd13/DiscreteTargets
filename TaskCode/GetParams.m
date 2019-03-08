@@ -57,6 +57,12 @@ if exist(Params.Datadir,'dir'),
 end
 mkdir(datadir);
 
+%% Sync to Blackrock
+Params.SerialSync = false;
+Params.SyncDev = '/dev/ttyS1';
+Params.BaudRate = 115200;
+
+Params.ArduinoSync = true;
 
 %% Timing
 Params.ScreenRefreshRate = 10; % Hz
@@ -71,28 +77,28 @@ Params.OffCol  = [100,100,100];
 Params.OnCol    = [0,255,0];
 Params.SelCol  = [255,0,0];
 
-Params.TargetAngles = (0:90:(360-90))';
+Params.TargetAngles = [0,180]';
 Params.TargetRadius = 300;
 Params.TargetPositions = ...
     + Params.TargetRadius ...
     * [cosd(Params.TargetAngles) sind(Params.TargetAngles)];
 Params.NumTargets = length(Params.TargetAngles);
 
-Params.TargetSelectionFlag  = 1; % 1-pseudorandom, 2-random
+Params.TargetSelectionFlag  = 2; % 1-pseudorandom, 2-random
 switch Params.TargetSelectionFlag,
     case 1, Params.TargetFunc = @(n) mod(randperm(n),Params.NumTargets)+1;
     case 2, Params.TargetFunc = @(n) mod(randi(n,1,n),Params.NumTargets)+1;
 end
 
 %% Trial and Block Types
-Params.NumImaginedBlocks    = 2;
+Params.NumImaginedBlocks    = 0;
 Params.NumFixedBlocks       = 2;
-Params.NumTrialsPerBlock    = Params.NumTargets;
+Params.NumTrialsPerBlock    = 2*Params.NumTargets;
 
 %% Hold Times
-Params.InterTrialInterval   = 1;
+Params.InterTrialInterval   = 3;
 Params.SelectionInterval    = 3;
-Params.InterBlockInterval   = 0;
+Params.InterBlockInterval   = 10;
 Params.FeedbackInterval     = 1;
 
 %% Feedback
@@ -131,36 +137,36 @@ Params.ReferenceModeStr = RefModeStr{Params.ReferenceMode+1};
 Params.FilterBank = [];
 Params.FilterBank(end+1).fpass = [.5,4];    % delta
 Params.FilterBank(end).feature = 1;
-Params.FilterBank(end+1).fpass = [4,8];     % theta
-Params.FilterBank(end).feature = 2;
-Params.FilterBank(end+1).fpass = [8,13];    % alpha
-Params.FilterBank(end).feature = 3;
+% Params.FilterBank(end+1).fpass = [4,8];     % theta
+% Params.FilterBank(end).feature = 2;
+% Params.FilterBank(end+1).fpass = [8,13];    % alpha
+% Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [13,19];   % beta1
-Params.FilterBank(end).feature = 4;
+Params.FilterBank(end).feature = 2;
 Params.FilterBank(end+1).fpass = [19,30];   % beta2
-Params.FilterBank(end).feature = 4;
-Params.FilterBank(end+1).fpass = [30,36];   % low gamma1 
-Params.FilterBank(end).feature = 5;
-Params.FilterBank(end+1).fpass = [36,42];   % low gamma2 
-Params.FilterBank(end).feature = 5;
-Params.FilterBank(end+1).fpass = [42,50];   % low gamma3
-Params.FilterBank(end).feature = 5;
+Params.FilterBank(end).feature = 2;
+% Params.FilterBank(end+1).fpass = [30,36];   % low gamma1 
+% Params.FilterBank(end).feature = 5;
+% Params.FilterBank(end+1).fpass = [36,42];   % low gamma2 
+% Params.FilterBank(end).feature = 5;
+% Params.FilterBank(end+1).fpass = [42,50];   % low gamma3
+% Params.FilterBank(end).feature = 5;
 Params.FilterBank(end+1).fpass = [70,77];   % high gamma1
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [77,85];   % high gamma2
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [85,93];   % high gamma3
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [93,102];  % high gamma4
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [102,113]; % high gamma5
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [113,124]; % high gamma6
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 Params.FilterBank(end+1).fpass = [124,136]; % high gamma7
 Params.FilterBank(end).feature = 6;
 Params.FilterBank(end+1).fpass = [136,150]; % high gamma8
-Params.FilterBank(end).feature = 6;
+Params.FilterBank(end).feature = 3;
 % compute filter coefficients
 for i=1:length(Params.FilterBank),
     [b,a] = butter(3,Params.FilterBank(i).fpass/(Params.Fs/2));

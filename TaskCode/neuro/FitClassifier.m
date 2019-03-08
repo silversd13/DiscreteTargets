@@ -11,12 +11,8 @@ function C = FitClassifier(Params,datadir,dimRedFunc)
 fprintf('\n\nFitting Classifer:\n')
 fprintf('  Data in %s\n', datadir)
 
-% neural features idx
-if Params.InterTrialInterval>0,
-    idx = 2;
-else,
-    idx = 1;
-end
+% always use gui to override datadir
+datadir = uigetdir(datadir);
 
 % grab data trial data
 datafiles = dir(fullfile(datadir,'Data*.mat'));
@@ -25,7 +21,15 @@ Y = [];
 for i=1:length(datafiles),
     % load data, grab neural data + target
     load(fullfile(datadir,datafiles(i).name)) %#ok<LOAD>
-    Xtrial = cat(2,TrialData.NeuralFeatures{idx,:});
+    % ignore inter-trial interval data
+    if strcmp(TrialData.Events(1).Str, 'Inter Trial Interval'),
+        tidx = (TrialData.Time >= TrialData.Events(2).Time) ...
+            & (TrialData.Time <= TrialData.Events(3).Time);
+    else,
+        tidx = (TrialData.Time >= TrialData.Events(1).Time) ...
+            & (TrialData.Time <= TrialData.Events(2).Time);
+    end
+    Xtrial = cat(2,TrialData.NeuralFeatures{:,tidx});
     % if DimRed is on, reduce dimensionality of neural features
     if exist('dimRedFunc','var'),
         Xtrial = dimRedFunc(Xtrial);
