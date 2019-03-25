@@ -36,7 +36,13 @@ fprintf('Target: (%i, { %i , %i })\n',...
 % keep track of update times
 dt_vec = [];
 dT_vec = [];
+
+% grab blackrock data and run through processing pipeline
 LastPredictTime = GetSecs;
+if Params.BLACKROCK,
+    Neuro.LastUpdateTime = LastPredictTime;
+    Neuro = NeuroPipeline(Neuro);
+end
 
 %% Inter Trial Interval
 if Params.InterTrialInterval>0,
@@ -80,10 +86,10 @@ if Params.InterTrialInterval>0,
                     Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                     if Params.BLACKROCK, % override
                         Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                        Data.NeuralTime{1,end} = tim;
+                        Data.NeuralTime(1,end) = tim;
                     else,
                         Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                        Data.NeuralTime{1,end+1} = tim;
+                        Data.NeuralTime(1,end+1) = tim;
                     end
                 end
                 if Neuro.DimRed.Flag,
@@ -144,10 +150,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                    Data.NeuralTime{1,end} = tim;
+                    Data.NeuralTime(1,end) = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                    Data.NeuralTime{1,end+1} = tim;
+                    Data.NeuralTime(1,end+1) = tim;
                 end
             end
             if Neuro.DimRed.Flag,
@@ -180,11 +186,9 @@ switch TaskFlag,
                 tidx = Data.Time >= Data.Events(1).Time;
             end
             if Neuro.DimRed.Flag,
-                X = cat(2,Data.NeuralFactors{:,tidx});
-                X = X(:)';
+                X = mean(cat(2,Data.NeuralFactors{:,tidx}),2)';
             else,
-                X = cat(2,Data.NeuralFeatures{:,tidx});
-                X = X(:)';
+                X = mean(cat(2,Data.NeuralFeatures{:,tidx}),2)';
             end
             Data.SelectedTargetID = predict(TargetClassifier,X);
         end
@@ -251,10 +255,10 @@ while ~done,
                 Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
                 if Params.BLACKROCK, % override
                     Data.NeuralFeatures{end} = Neuro.NeuralFeatures;
-                    Data.NeuralTime{1,end} = tim;
+                    Data.NeuralTime(1,end) = tim;
                 else,
                     Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-                    Data.NeuralTime{1,end+1} = tim;
+                    Data.NeuralTime(1,end+1) = tim;
                 end
             end
             if Neuro.DimRed.Flag,

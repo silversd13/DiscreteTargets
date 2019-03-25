@@ -54,18 +54,24 @@ end
 %% Neural Signal Processing
 % create neuro structure for keeping track of all neuro updates/state
 % changes
-Neuro.SaveRaw           = Params.SaveRaw;
 Neuro.ZscoreRawFlag     = Params.ZscoreRawFlag;
 Neuro.ZscoreFeaturesFlag= Params.ZscoreFeaturesFlag;
 Neuro.DimRed            = Params.DimRed;
 Neuro.SaveProcessed     = Params.SaveProcessed;
+Neuro.SaveRaw           = Params.SaveRaw;
 Neuro.FilterBank        = Params.FilterBank;
 Neuro.NumChannels       = Params.NumChannels;
 Neuro.BufferSamps       = Params.BufferSamps;
 Neuro.BadChannels       = Params.BadChannels;
 Neuro.ReferenceMode     = Params.ReferenceMode;
+Neuro.NumPhase          = Params.NumPhase;
+Neuro.NumPower          = Params.NumPower;
+Neuro.NumBuffer         = Params.NumBuffer;
+Neuro.NumHilbert        = Params.NumHilbert;
 Neuro.NumFeatures       = Params.NumFeatures;
 Neuro.LastUpdateTime    = GetSecs;
+Neuro.UpdateChStatsFlag = Params.UpdateChStatsFlag;
+Neuro.UpdateFeatureStatsFlag = Params.UpdateFeatureStatsFlag;
 
 % initialize filter bank state
 for i=1:length(Params.FilterBank),
@@ -87,7 +93,7 @@ Neuro.FeatureStats.S      = zeros(1,Params.NumChannels); % aggregate deviation f
 Neuro.FeatureStats.var    = zeros(1,Params.NumChannels); % estimate of variance for each channel
 
 % create low freq buffers
-Neuro.FilterDataBuf = zeros(Neuro.BufferSamps,Neuro.NumChannels,3);
+Neuro.FilterDataBuf = zeros(Neuro.BufferSamps,Neuro.NumChannels,Neuro.NumBuffer);
 
 %% Check Important Params with User
 LogicalStr = {'false', 'true'};
@@ -99,6 +105,8 @@ fprintf('\n    - task: %s', Params.Task)
 fprintf('\n    - subject: %s', Params.Subject)
 fprintf('\n    - blackrock mode: %s', LogicalStr{Params.BLACKROCK+1})
 fprintf('\n    - debug mode: %s', LogicalStr{Params.DEBUG+1})
+fprintf('\n    - serial sync: %s', LogicalStr{Params.SerialSync+1})
+fprintf('\n    - arduino sync: %s', LogicalStr{Params.ArduinoSync+1})
 
 fprintf('\n\n  Neuro Processing Pipeline:')
 if Params.GenNeuralFeaturesFlag,
@@ -107,17 +115,20 @@ else,
     fprintf('\n    - reference mode: %s', Params.ReferenceModeStr)
     fprintf('\n    - zscore raw: %s', LogicalStr{Params.ZscoreRawFlag+1})
     fprintf('\n    - zscore features: %s', LogicalStr{Params.ZscoreFeaturesFlag+1})
-    fprintf('\n    - save filtered data: %s', LogicalStr{Params.ZscoreRawFlag+1})
+    fprintf('\n    - save raw data: %s', LogicalStr{Params.SaveRaw+1})
+    fprintf('\n    - save filtered data: %s', LogicalStr{Params.SaveProcessed+1})
 end
 fprintf('\n    - dimensionality reduction: %s', LogicalStr{Params.DimRed.Flag+1})
 if Params.DimRed.Flag,
     fprintf('\n      - method: %s', DimRedStr{Params.DimRed.Method})
+    fprintf('\n      - before clda: %s', LogicalStr{Params.DimRed.InitAdapt+1})
+    fprintf('\n      - before fixed: %s', LogicalStr{Params.DimRed.InitFixed+1})
 end
 
 fprintf('\n\n  Decoding Parameters:')
-fprintf('\n    - Imagined Movements: %s', LogicalStr{double(Params.NumImaginedBlocks>0) +1})
-fprintf('\n    - Fixed Decoding: %s', LogicalStr{double(Params.NumFixedBlocks>0) +1})
-
+fprintf('\n    - Imagined Selection: %s', LogicalStr{double(Params.NumImaginedBlocks>0) +1})
+fprintf('\n    - Fixed Selection: %s', LogicalStr{double(Params.NumFixedBlocks>0) +1})
+fprintf('\n        - Classifier: %s', Params.ClassifierTypeStr);
 
 str = input('\n\nContinue? (''n'' to quit, otherwise continue)\n' ,'s');
 if strcmpi(str,'n'),
@@ -142,7 +153,33 @@ Screen('TextSize',Params.WPTR, 28);
 try
     % Baseline 
     if Params.BaselineTime>0,
+        % turn on update stats flags
+        UpdateChStatsFlag = Params.UpdateChStatsFlag;
+        UpdateFeatureStatsFlag = Params.UpdateFeatureStatsFlag;
+        Params.UpdateChStatsFlag = true;
+        Params.UpdateFeatureStatsFlag = true;
+        
+        % collect data during baseline period
         Neuro = RunBaseline(Params,Neuro);
+        
+        % set flags back to original vals
+        Params.UpdateChStatsFlag = UpdateChStatsFlag;
+        Params.UpdateFeatureStatsFlag = UpdateFeatureStatsFlag;
+        
+        % save of useful stats and params
+        ch_stats = Neuro.ChStats;
+        save(fullfile(Params.ProjectDir,'TaskCode','persistence','ch_stats.mat'),...
+            'ch_stats','-v7.3','-nocompression');
+        feature_stats = Neuro.FeatureStats;
+        save(fullfile(Params.ProjectDir,'TaskCode','persistence','feature_stats.mat'),...
+            'feature_stats','-v7.3','-nocompression');
+    else, % if baseline is set to 0, just load stats
+        fprintf('\nLoading Baseline Stats\n')
+        f=load(fullfile(Params.ProjectDir,'TaskCode','persistence','ch_stats.mat'));
+        Neuro.ChStats = f.ch_stats;
+        f=load(fullfile(Params.ProjectDir,'TaskCode','persistence','feature_stats.mat'));
+        Neuro.FeatureStats = f.feature_stats;
+        clear('f');
     end
     
     % Imagined Selection Loop
@@ -150,7 +187,7 @@ try
         [Neuro,Params] = RunTask(Params,Neuro,1);
     end
     
-    % Fixed Decoder Loop
+    % Fixed Selection Loop
     if Params.NumFixedBlocks>0,
         [Neuro,Params] = RunTask(Params,Neuro,2);
     end

@@ -34,14 +34,14 @@ for i=1:length(datafiles),
     if exist('dimRedFunc','var'),
         Xtrial = dimRedFunc(Xtrial);
     end
-    X = cat(1,X,Xtrial(:)');
+    X = cat(1,X,mean(Xtrial,2)');
     Y = cat(1,Y,TrialData.TargetID);
 end
 
 % fit classifier
 switch Params.ClassifierType,
-    case 1, C = fitcdiscr(X,Y,'DiscrimType','linear');
-    case 2, C = fitcdiscr(X,Y,'DiscrimType','quadratic');
+    case 1, C = fitcdiscr(X,Y,'DiscrimType','linear','Prior','uniform');
+    case 2, C = fitcdiscr(X,Y,'DiscrimType','quadratic','Prior','uniform');
 end
 
 end % FitClassifier

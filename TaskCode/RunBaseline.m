@@ -4,10 +4,9 @@ function Neuro = RunBaseline(Params,Neuro)
 % 
 % Neuro - contains NeuralStats structure w/ mean and var of each chan
 
-global Cursor
-
 fprintf('Collecting Baseline')
 
+msg = '';
 tstart  = GetSecs;
 tlast = tstart;
 done = 0;
@@ -24,13 +23,15 @@ while ~done,
         tlast = tim;
         
         % grab and process neural data
-        if Params.BLACKROCK && ((tim-Cursor.LastUpdateTime)>1/Params.NeuralRefreshRate),
-            % update command line with progress
-            fprintf('.')
-            Cursor.LastUpdateTime = tim;
-            Cursor.LastPredictTime = tim;
+        if Params.BLACKROCK && ((tim-Neuro.LastUpdateTime)>1/Params.NeuralRefreshRate),
+            Neuro.LastUpdateTime = tim;
             Neuro = NeuroPipeline(Neuro);
         end
+        
+        % update command line with progress
+        fprintf(repmat('\b',1,length(msg)-1))
+        msg = sprintf('Computing Baseline: %i%s\n', round(100*(tim-tstart)/Params.BaselineTime),'%%');
+        fprintf(1,msg)
         
         % update screen with progress
         tex = sprintf('Computing Baseline: %.1f%% ', 100*(tim-tstart)/Params.BaselineTime);

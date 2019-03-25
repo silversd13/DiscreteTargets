@@ -33,11 +33,11 @@ while 1, % pause until subject presses p again or quits
         Neuro.LastUpdateTime = tim;
         if Params.BLACKROCK,
             [Neuro,Data] = NeuroPipeline(Neuro,Data);
-            Data.NeuralTime{1,end+1} = tim;
+            Data.NeuralTime(1,end+1) = tim;
         elseif Params.GenNeuralFeaturesFlag,
             Neuro.NeuralFeatures = VelToNeuralFeatures(Params);
             Data.NeuralFeatures{end+1} = Neuro.NeuralFeatures;
-            Data.NeuralTime{1,end+1} = tim;
+            Data.NeuralTime(1,end+1) = tim;
         end
     end
 end
